@@ -7,7 +7,7 @@ from k8s.models.deployment import Deployment, DeploymentSpec, LabelSelector
 
 # Get the Token from the environment
 GITHUB_ACCESS_TOKEN = os.getenv('GITHUB_ACCESS_TOKEN')
-MIN_RUNNERS = os.getenv('MIN_RUNNERS')
+MIN_RUNNERS = int(os.getenv('MIN_RUNNERS'))
 ORG_NAME = os.getenv('ORG_NAME')
 SECRET_NAME = os.getenv('SECRET_NAME')
 DEPLOYMENT_NAME = os.getenv('DEPLOYMENT_NAME')
@@ -34,13 +34,14 @@ BUSY = 0
 for runner in response['runners']:
     if runner['busy']:
         BUSY += 1
-PERCENT_IDLE = (( TOTAL_RUNNERS - BUSY ) / TOTAL_RUNNERS )
+
+PERCENT_IDLE = float(( TOTAL_RUNNERS - BUSY ) / TOTAL_RUNNERS )
 
 config.api_server = K8S_HOST
 config.verify_ssl = False
 config.api_token = K8S_TOKEN
 deployment = Deployment.get(DEPLOYMENT_NAME)
-REPLICAS = deployment.spec.replicas
+REPLICAS = int(deployment.spec.replicas)
 
 if PERCENT_IDLE <= 0.4:
     REPLICAS = math.ceil( REPLICAS + ( REPLICAS / 2 ) )
@@ -48,6 +49,6 @@ elif PERCENT_IDLE >= 0.8:
     REPLICAS = math.ceil( REPLICAS - ( REPLICAS / 3 ) )
     if REPLICAS < MIN_RUNNERS:
         REPLICAS = MIN_RUNNERS
+
 deployment.spec.replicas = REPLICAS
 deployment.save()
-
