@@ -13,9 +13,9 @@ from k8s.models.deployment import Deployment, DeploymentSpec, LabelSelector
 # Get the Token from the environment
 GITHUB_ACCESS_TOKEN = os.getenv('GITHUB_ACCESS_TOKEN')
 MIN_RUNNERS = int(os.getenv('MIN_RUNNERS'))
-ORG_NAME = os.getenv('ORG_NAME')
 DEPLOYMENT_NAME = os.getenv('DEPLOYMENT_NAME')
 NAMESPACE = os.getenv('NAMESPACE')
+ORG_NAME = os.getenv('ORG_NAME')
 K8S_TOKEN = os.getenv('K8S_TOKEN')
 K8S_HOST = os.getenv('K8S_HOST')
 # To do: use CA certificate (not ignore ca cert)
@@ -33,7 +33,11 @@ config.api_token = K8S_TOKEN
 # Return a dict with runners status
 async def get_runners(orgname):
     # Get the runners running
-    response = requests.get(f"https://api.github.com/orgs/{orgname}/actions/runners", headers=headers)
+    try:
+        response = requests.get(f"https://api.github.com/orgs/{orgname}/actions/runners", headers=headers)
+    except Exception as e:
+        print("Erro " + e)
+        exit()
     # Converting to JSON
     response = response.json()
     # Number of runners 
@@ -68,15 +72,12 @@ async def discover_replica():
         runners_status = await get_runners(ORG_NAME)
         print(runners_status)
         PERCENT_IDLE = await percent_calc(runners_status['total_count'],runners_status['busy'])
-        print(PERCENT_IDLE)
         if len(list_of_idle) == 5:
             list_of_idle.pop(0)
             list_of_idle.append(PERCENT_IDLE)
         else:
             list_of_idle.append(PERCENT_IDLE)
-        print(list_of_idle)
         MID_IDLE = float(sum(list_of_idle) / len(list_of_idle))
-        print(MID_IDLE)
         await asyncio.sleep(15)
     return MID_IDLE
 
@@ -84,23 +85,23 @@ async def define_replica(idle):
     REPLICAS = await get_deploy_replicas(DEPLOYMENT_NAME)
     print("Current replicas %d" % REPLICAS)
     if idle <= 0.4:
-        print("Scale up")
         REPLICAS = math.ceil( REPLICAS + ( REPLICAS / 2 ) )
     elif idle >= 0.8:
-        print("Scale down")
         REPLICAS = math.ceil( REPLICAS - ( REPLICAS / 3 ) )
-    else:
-        print("No Change in replicas")
-    if REPLICAS < MIN_RUNNERS:
-        REPLICAS = MIN_RUNNERS
+        if REPLICAS < MIN_RUNNERS:
+            REPLICAS = MIN_RUNNERS
     return REPLICAS
 
 async def apply_deploy(deploymentname,numreplicas):
     deployment = Deployment.get(deploymentname)
     if deployment.spec.replicas != numreplicas:
+        if numreplicas > deployment.spec.replicas:
+            msg_scale = "Scale Up" 
+        else:
+            msg_scale = "Scale Down"
         deployment.spec.replicas = numreplicas
         deployment.save()
-        print("Set replicas %d" % numreplicas)
+        print("%s. Set replicas %d" % (msg_scale, numreplicas))
     else:
         print("Replicas already in %d. Not set replicas." % MIN_RUNNERS)
     await asyncio.sleep(90)

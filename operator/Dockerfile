@@ -5,6 +5,8 @@ ENV DEPLOYMENT_NAME='github-runners'
 ENV NAMESPACE='default'
 
 WORKDIR /app
-ADD autoscale.py /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY autoscale.py .
 
-ENTRYPOINT [ "autoscale.py" ]
+CMD [ "python", "-u", "/app/autoscale.py" ]
