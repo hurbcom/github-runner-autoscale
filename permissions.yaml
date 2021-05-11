@@ -7,22 +7,6 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: secret-all # Change the name if you want
-  namespace: default # Replace for your environment namespace
-rules:
-- apiGroups: 
-  - ""
-  resources:
-  - secrets
-  verbs:
-  - list
-  - delete
-  - create
-  - get
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
   name: deploy-update # Change the name if you want
   namespace: default
 rules:
@@ -34,20 +18,6 @@ rules:
   - list
   - get
   - update
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: binding-secret # Change the name if you want
-  namespace: default
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: secret-all # Set the same role name used before
-subjects:
-- kind: ServiceAccount
-  name: github.runner # You need use the same serviceaccount created
-  namespace: default
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
