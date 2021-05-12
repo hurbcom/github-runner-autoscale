@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: github-runner-autoscale
+  labels:
+    app: github-runner-autoscale
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: github-runner-autoscale
+  template:
+    metadata:
+      labels:
+        app: github-runner-autoscale
+    spec:
+      containers:
+      - name: github-runner-autoscale
+        image: lsilvatux/github-runner-autoscale
+        imagePullPolicy: Always
+        env:
+        - name: ORG_NAME
+          value: <<your organization name here>>
+        - name: K8S_HOST
+          value: <<your kubernetes host here>>
+        - name: MIN_RUNNERS
+          value: "6"
+        - name: DEPLOYMENT_NAME
+          value: github-runners  # You can change the name and namespace if want                         
+        - name: NAMESPACE
+          value: default
+        - name: GITHUB_ACCESS_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: github-access-token
+              key: personal.token
+        - name: K8S_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: github.runner-token-2gn77
+              key: token
