@@ -37,5 +37,5 @@ spec:
         - name: K8S_TOKEN
           valueFrom:
             secretKeyRef:
-              name: github.runner-token-2gn77
+              name: <<your github service account secret name here>>
               key: token
