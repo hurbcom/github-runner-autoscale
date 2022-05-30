@@ -18,6 +18,7 @@ NAMESPACE = os.getenv('NAMESPACE')
 ORG_NAME = os.getenv('ORG_NAME')
 K8S_TOKEN = os.getenv('K8S_TOKEN')
 K8S_HOST = os.getenv('K8S_HOST')
+LABEL = os.getenv('LABEL')
 # To do: use CA certificate (not ignore ca cert)
 #K8S_SSL_CA = os.getenv('K8S_SSL_CA')
 # Specify the header with token
@@ -40,12 +41,18 @@ async def get_runners(orgname):
         exit()
     # Converting to JSON
     response = response.json()
-    # Number of runners 
-    TOTAL_RUNNERS = int(response['total_count'])
+    # Number of runners
+    runners = []
+    for runner_index in range(len(response['runners'])):
+        for label in response['runners'][runner_index]['labels']:
+            if label['name'] == LABEL:
+                runners.append(response['runners'][runner_index])
+                continue
+    TOTAL_RUNNERS = int(len(runners))
     # I don't known how many is busy
     BUSY = 0
     # Get the runners busy
-    for runner in response['runners']:
+    for runner in runners:
         if runner['busy']:
             BUSY += 1    
     # Calculate number of idle

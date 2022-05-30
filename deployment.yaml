@@ -23,6 +23,8 @@ spec:
           value: <<your organization name here>>
         - name: K8S_HOST
           value: <<your kubernetes host here>>
+        - name: LABEL
+          value: <<self hosted runner label>> # This is used for multiples types of runners
         - name: MIN_RUNNERS
           value: "6"
         - name: DEPLOYMENT_NAME
