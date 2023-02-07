@@ -26,6 +26,6 @@ jobs:
         with:
           file: ./operator/Dockerfile
           push: true
-          tags: lsilvatux/github-runner-autoscale:${{ steps.get_version.outputs.VERSION }}, lsilvatux/github-runner-autoscale:latest
+          tags: hurb/github-runner-autoscale:${{ steps.get_version.outputs.VERSION }}, hurb/github-runner-autoscale:latest
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
