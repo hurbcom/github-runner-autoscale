@@ -23,7 +23,7 @@ kubectl create secret generic github-access-token --from-literal=personal.token=
 After this you need give some rights to this service account. We create a role to easy  manage the service account and your access:
 
 ```
-kubectl create role deploy-update --verb=list,get,update --resource=deployment
+kubectl create role deploy-update --verb=list,get,update,patch --resource=deployment
 kubectl create rolebinding binding-deploy --role=deploy-update --serviceaccount=default:github.runner --namespace=default
 ```
 
