@@ -27,6 +27,8 @@ spec:
           value: <<self hosted runner label>> # This is used for multiples types of runners
         - name: MIN_RUNNERS
           value: "6"
+        - name: MAX_RUNNERS
+          value: "50"
         - name: DEPLOYMENT_NAME
           value: github-runners  # You can change the name and namespace if want                         
         - name: NAMESPACE

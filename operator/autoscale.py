@@ -13,6 +13,7 @@ from k8s.models.deployment import Deployment, DeploymentSpec, LabelSelector
 # Get the Token from the environment
 GITHUB_ACCESS_TOKEN = os.getenv('GITHUB_ACCESS_TOKEN')
 MIN_RUNNERS = int(os.getenv('MIN_RUNNERS'))
+MAX_RUNNERS = int(os.getenv('MAX_RUNNERS'))
 DEPLOYMENT_NAME = os.getenv('DEPLOYMENT_NAME')
 NAMESPACE = os.getenv('NAMESPACE')
 ORG_NAME = os.getenv('ORG_NAME')
@@ -93,6 +94,8 @@ async def define_replica(idle):
     print("Current replicas %d" % REPLICAS)
     if idle <= 0.4:
         REPLICAS = math.ceil( REPLICAS + ( REPLICAS / 2 ) )
+        if REPLICAS > MAX_RUNNERS:
+            REPLICAS = MAX_RUNNERS
     elif idle >= 0.8:
         REPLICAS = math.ceil( REPLICAS - ( REPLICAS / 3 ) )
         if REPLICAS < MIN_RUNNERS:
