@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: github-runner-autoscale
-        image: lsilvatux/github-runner-autoscale
+        image: hurb/github-runner-autoscale:latest
         imagePullPolicy: Always
         env:
         - name: ORG_NAME
