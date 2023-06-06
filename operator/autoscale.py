@@ -46,7 +46,7 @@ async def get_runners(orgname):
     runners = []
     for runner_index in range(len(response['runners'])):
         for label in response['runners'][runner_index]['labels']:
-            if label['name'] == LABEL and runner_index['status'] == 'online':
+            if label['name'] == LABEL and response['runners'][runner_index]['status'] == 'online':
                 runners.append(response['runners'][runner_index])
                 continue
     TOTAL_RUNNERS = int(len(runners))
